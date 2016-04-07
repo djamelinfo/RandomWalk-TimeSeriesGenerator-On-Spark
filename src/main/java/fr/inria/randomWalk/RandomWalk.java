@@ -32,15 +32,13 @@ public class RandomWalk {
     public static void main(String[] args) {
 
         if(args.length < 2) {
-            System.err.println(
-                    "Usage: randomWalkTimeSeriesGenerator <Output> <TimeSeriesNbr> <TimeSeriesSize>");
+            System.err.println( "Usage: randomWalkTimeSeriesGenerator <Output> <TimeSeriesNbr> <TimeSeriesSize>");
             System.exit(1);
         }
 
         SparkConf conf = new SparkConf().setAppName("randomWalkTimeSeriesGenerator")
-                .set("spark.serializer",
-                     "org.apache.spark.serializer.KryoSerializer").
-                set("spark.kryo.registrationRequired", "true");
+                                        .set("spark.serializer","org.apache.spark.serializer.KryoSerializer")
+                                        .set("spark.kryo.registrationRequired", "true");
 
         conf.registerKryoClasses(new Class<?>[] {
             float[].class,
