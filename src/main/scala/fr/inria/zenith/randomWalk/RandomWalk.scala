@@ -18,13 +18,59 @@
 
 package fr.inria.zenith.randomWalk
 
+import org.apache.spark.mllib.linalg.Vector
+import org.apache.spark.mllib.random.RandomRDDs
+import org.apache.spark.rdd.RDD
+import org.apache.spark.{SparkConf, SparkContext}
+
 /**
   *
   * @author Djamel Edine YAGOUBI <djamel-edine.yagoubi@inria.fr>
   */
 object RandomWalk {
 
+
+  def parseVectors(vector: Vector, long: Long): Array[Float] = {
+
+
+    val tab = vector.toArray
+    val tab2 = new Array[Float](257)
+    var i = 0
+    for (a <- 1 to tab2.length) {
+      tab2(a) = tab.indexOf(a - 1)
+    }
+    tab2(0) = long.toInt
+
+    tab2
+  }
+
+
   def main(args: Array[String]) {
+
+    if (args.length < 2) {
+      System.err.println("Usage: randomWalkTimeSeriesGenerator <Output> <TimeSeriesNbr> <TimeSeriesSize>")
+      System.exit(1)
+    }
+
+    val conf = new SparkConf().setAppName("randomWalkTimeSeriesGenerator")
+      .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+      .set("spark.kryo.registrationRequired", "true")
+
+    conf.registerKryoClasses(Array[Class[_]](classOf[Array[Float]], classOf[Array[Double]]))
+
+    val sc = new SparkContext(conf)
+
+    val rdd: RDD[Vector] = RandomRDDs.normalVectorRDD(sc, args(1).toLong, args(2).toInt)
+
+
+    val finalRdd = rdd.zipWithUniqueId().map(x => parseVectors(x._1, x._2))
+
+    finalRdd.saveAsObjectFile(args(0))
+
+    System.out.println(finalRdd.toDebugString)
+
+    sc.stop()
+
 
   }
 
