@@ -27,7 +27,7 @@ import org.apache.spark.{SparkConf, SparkContext}
   *
   * @author Djamel Edine YAGOUBI <djamel-edine.yagoubi@inria.fr>
   */
-object RandomWalk {
+object RandomWalkScala {
 
 
   def parseVectors(vector: Vector, long: Long): Array[Float] = {
@@ -36,8 +36,8 @@ object RandomWalk {
     val tab = vector.toArray
     val tab2 = new Array[Float](257)
     var i = 0
-    for (a <- 1 to tab2.length) {
-      tab2(a) = tab.indexOf(a - 1)
+    for (a <- 1 to tab2.length - 1) {
+      tab2(a) = tab(a - 1).toFloat
     }
     tab2(0) = long.toInt
 
